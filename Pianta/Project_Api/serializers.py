@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Devices, Project, Template
+from .models import Devices, Project, Template, DatosSensores, SharedProject
 
 
 
@@ -12,7 +12,15 @@ from .models import Devices, Project, Template
 #         except Project.DoesNotExist:
 #             raise serializers.ValidationError("Invalid idrandom")
 #         return value
-    
+
+class SharedRelationSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    class Meta:
+        model = SharedProject
+        fields = ['id', 'user', 'project', 'timestamp']
+        
+class ShareProjectSerializer(serializers.Serializer):
+    idrandom = serializers.CharField(max_length=300)
     
 class ProjectSerializer(serializers.ModelSerializer):
     relationUserProject = serializers.ReadOnlyField(source='relationUserProject.username')
@@ -50,3 +58,8 @@ class TemplateSerializer(serializers.ModelSerializer):
             "red",
             "descripcion",
         )
+class DatosSensoresSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DatosSensores
+        fields = ['name', 'created_at', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12']
+        read_only_fields = ['name', 'created_at', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12']
