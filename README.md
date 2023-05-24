@@ -7,9 +7,15 @@ Una plataforma IOT que presenta una solución integral diseñada específicament
 
 ##Tecnologias usadas:
 
-Flutter/Dart>
-Django>
-Mysql server>
+Flutter/Dart
+
+
+Django
+
+
+Mysql server
+
+
 
 
 
