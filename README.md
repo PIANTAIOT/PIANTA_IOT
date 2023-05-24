@@ -1,4 +1,4 @@
-# pianta
+# PIANTA
 
 
 ## Descripcion del proyecto
