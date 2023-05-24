@@ -1,6 +1,5 @@
 # PIANTA
 
-## Contenido
 
 ## Descripcion del proyecto
 
