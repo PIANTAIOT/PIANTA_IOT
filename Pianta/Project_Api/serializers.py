@@ -40,24 +40,51 @@ class ProjectSerializer(serializers.ModelSerializer):
         return project
 
 class DevicesSerializer(serializers.ModelSerializer):
+    relationUserDevice = serializers.ReadOnlyField(source='relationUserDevice.username')
     class Meta:
         model = Devices
-        fields = (
+        fields = [
             "id",
             "name",
             "location",
-        )
+            "relationUserDevice",
+        ]
+        read_only_fields = ['id']
+    
+    def create(self, validated_data):
+        # Obtenemos el usuario autenticado de la solicitud
+        user = self.context["request"].user
+        # Establecemos el valor de relationUserDevice en el usuario autenticado
+        validated_data["relationUserDevice"] = user
+        # Creamos el objeto relationUserDevice usando los datos validados actualizados
+        devices = Devices.objects.create(**validated_data)
+        return devices
+    
     
 class TemplateSerializer(serializers.ModelSerializer):
+    relationUserTemplate = serializers.ReadOnlyField(source='relationUserTemplate.username')
     class Meta:
         model = Template
-        fields = (
+        fields = [
             "id",
             "name",
             "sensor",
             "red",
             "descripcion",
-        )
+            "relationUserTemplate",
+        ]
+        read_only_fields = ['id']
+        
+    def create(self, validated_data):
+        # Obtenemos el usuario autenticado de la solicitud
+        user = self.context["request"].user
+        # Establecemos el valor de relationUserDevice en el usuario autenticado
+        validated_data["relationUserTemplate"] = user
+        # Creamos el objeto relationUserDevice usando los datos validados actualizados
+        template = Template.objects.create(**validated_data)
+        return template
+    
+        
 class DatosSensoresSerializer(serializers.ModelSerializer):
     class Meta:
         model = DatosSensores

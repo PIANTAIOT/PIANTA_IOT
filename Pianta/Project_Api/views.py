@@ -45,6 +45,8 @@ from django.http import Http404
 #             return redirect('Project_detail_share', idrandom=idrandom)
 #         else:
 #             return JsonResponsdsdsadasde(serializer.errors, status=400)
+
+
 class ShareProjectView(generics.CreateAPIView):
     permission_classes = (AllowAny,)
     serializer_class = ShareProjectSerializer
@@ -237,14 +239,25 @@ class ProjectDetailApiView(APIView):
 
 
 class DevicesListApiView(APIView):
-     #Lista todos los registros
-    def get( self, request, *args, **kwargs):
+    permission_classes = (IsAuthenticated, )
+    queryset = Devices.objects.all()
+    serializer_class = DevicesSerializer
+
+    def get_queryset(self):
+        return Devices.objects.filter(relationUserDevice=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(relationUserDevice=self.request.user)
+
+    def get(self, request, *args, **kwargs):
         '''
-        List all the project items for given requeted user
+        List all the project items for given requested user
         '''
-        devices = Devices.objects
+        devices = Devices.objects.filter(relationUserDevice=request.user)
         serializer = DevicesSerializer(devices, many=True)
-        return Response(serializer.data, status= status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+     #Lista todos los registros
+
     
     #Crea un nuevo registro
     def post(self, request, *args, **kwags):
@@ -256,7 +269,7 @@ class DevicesListApiView(APIView):
             'name' : request.data.get('name'),
             'location': request.data.get('location'),
         }
-        serializer = DevicesSerializer(data=data)
+        serializer = DevicesSerializer(data=data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -267,7 +280,7 @@ class DevicesDetailApiView(APIView):
     #Método auxiliar para obtener el objecto con project_id dado
     def get_objects(self, device_id):
         try:
-            return Devices.objects.get(id= device_id)
+            return Devices.objects.get(id=device_id, relationUserDevice=self.request.user)
         except Devices.DoesNotExist:
             return None
     #Recupera el elemento Project con project_id dado
@@ -317,14 +330,24 @@ class DevicesDetailApiView(APIView):
         )   
 
 class TemplateListApiView(APIView):
-    # Lista todos los registros
+    permission_classes = (IsAuthenticated, )
+    queryset = Template.objects.all()
+    serializer_class = TemplateSerializer
+
+    def get_queryset(self):
+        return Template.objects.filter(relationUserTemplate=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(relationUserTemplate=self.request.user)
+
     def get(self, request, *args, **kwargs):
         '''
         List all the project items for given requested user
         '''
-        templates = Template.objects.all()
-        serializer = TemplateSerializer(templates, many=True)
+        template = Template.objects.filter(relationUserTemplate=request.user)
+        serializer = TemplateSerializer(template, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    # Lista todos los registros
 
     # Crea un nuevo registro
     def post(self, request, *args, **kwargs):
@@ -338,11 +361,10 @@ class TemplateListApiView(APIView):
             'red' : request.data.get('red'),
             'descripcion': request.data.get('descripcion'),
         }
-        serializer = TemplateSerializer(data=data)
+        serializer = TemplateSerializer(data=data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class TemplateDetailApiView(APIView):
