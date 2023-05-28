@@ -15,7 +15,6 @@
   }
 }
  */
-
 class CardModel {
   String title;    // Título de la tarjeta
   String content;  // Contenido de la tarjeta
