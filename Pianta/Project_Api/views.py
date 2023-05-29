@@ -3,7 +3,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from Project_Api.models import Devices, Project, Template, DatosSensores, SharedProject
+from Project_Api.models import Devices, Project, Template, DatosSensores, SharedProject, graphics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import generics
 from django.urls import reverse
-from Project_Api.serializers import  DevicesSerializer, ProjectSerializer, TemplateSerializer, ShareProjectSerializer, DatosSensoresSerializer, SharedRelationSerializer#, SharedProjectValidationSerializer
+from Project_Api.serializers import  DevicesSerializer, ProjectSerializer, TemplateSerializer, ShareProjectSerializer, DatosSensoresSerializer, SharedRelationSerializer, GraphicsSerializer#, SharedProjectValidationSerializer
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from django.shortcuts import render, redirect
@@ -447,11 +447,9 @@ def save_DatosSensores(request):
         sensor10_value = data_dict.get('v10', 0)
         sensor11_value = data_dict.get('v11', 0)
         sensor12_value = data_dict.get('v12', 0)
-        
         # Guardar los valores de los sensores en la base de datos
         datos_sensores = DatosSensores(v1=sensor1_value, v2=sensor2_value,v3=sensor3_value,v4=sensor4_value,v5=sensor5_value,v6=sensor6_value,v7=sensor7_value,v8=sensor8_value,v9=sensor9_value,v10=sensor10_value,v11=sensor11_value,v12=sensor12_value,name=namePerson )
         datos_sensores.save()
-        
         # Devolver una respuesta exitosa
         response_data = {'status': 'success'}
         return JsonResponse(response_data)
@@ -471,3 +469,92 @@ def datos_sensores(request, field):
     datos_sensores = DatosSensores.objects.values('name', 'created_at', field)
     serializer = DatosSensoresSerializer(datos_sensores, many=True)
     return Response(serializer.data)
+
+#Graphics
+class GraphicsApiView(APIView):
+    permission_classes = (IsAuthenticated, )
+    queryset = graphics.objects.all()
+    serializer_class = GraphicsSerializer
+
+    def get_queryset(self):
+        return graphics.objects.filter(relationUserGraphics=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(relationUserGraphics=self.request.user)
+
+    def get(self, request, *args, **kwargs):
+        '''
+        List all the project items for given requested user
+        '''
+        graphicss = graphics.objects.filter(relationUserGraphics=request.user)
+        serializer = GraphicsSerializer(graphicss, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        '''
+        Create a new project with the given data
+        '''
+        data = {
+            'titlegraphics': request.data.get('titlegraphics'),
+            'namegraphics': request.data.get('namegraphics'),
+            'aliasgraphics': request.data.get('aliasgraphics'),
+        }
+        serializer = GraphicsSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+class GraphicsApiDetailView(APIView):
+    def get_object(self, graphics_id):
+        try:
+            return graphics.objects.get(id=graphics_id)
+        except graphics.DoesNotExist:
+            return None
+
+    # Recupera el elemento Project con project_id dado
+    def get(self, request, graphics_id, *args, **kwargs):
+        graphics_instance = self.get_object(graphics_id)
+        if not graphics_instance:
+            return Response(
+                {"res": "Object with template id does not exist"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer = GraphicsSerializer(graphics_instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # Actualiza el elemento Project con project_id dado, si existe
+    def put(self, request, graphics_id, *args, **kwargs):
+        graphics_instance = self.get_object(graphics_id)
+        if not graphics_instance:
+            return Response(
+                {"res": "Object with graphics id does not exist"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        data = {
+            'titlegraphics': request.data.get('titlegraphics'),
+            'namegraphics': request.data.get('namegraphics'),
+            'aliasgraphics': request.data.get('aliasgraphics'),
+        }
+        serializer = GraphicsSerializer(
+            instance=graphics_instance,
+            data=data,
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # Elimina el elemento Project con project_id dado, si existe
+    def delete(self, request, graphics_id, *args, **kwargs):
+        graphics_instance = self.get_object(graphics_id)
+        if not graphics_instance:
+            return Response(
+                {"res": "Object with template id does not exist"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        graphics_instance.delete()
+        return Response(
+            {"res": "Object deleted!"},
+            status=status.HTTP_200_OK
+        )
+    

@@ -35,11 +35,8 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = ('username', 'email')
-
-
 # class CustomUserDetailsSerializer(UserDetailsSerializer):
 #     last_login = serializers.DateTimeField(read_only=True)
-
 #     class Meta(UserDetailsSerializer.Meta):
 #         fields = UserDetailsSerializer.Meta.fields + ('last_login',)
 

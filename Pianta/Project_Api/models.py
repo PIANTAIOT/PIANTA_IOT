@@ -36,8 +36,6 @@ class Template(models.Model):
     relationUserTemplate = models.ForeignKey(User, on_delete=models.CASCADE, related_name='templates', default=None)
 
 
-
-
 class DatosSensores(models.Model):
     name = models.CharField(max_length=255)
     v1 = models.FloatField()
@@ -69,3 +67,13 @@ class DatosSensores(models.Model):
         self.created_at = adjusted_time
         super().save(*args, **kwargs)
 # Create your models here.
+
+class graphics(models.Model):
+    id = models.AutoField(primary_key= True)
+    titlegraphics = models.CharField(max_length=1000, blank=True, null= False)
+    namegraphics = models.CharField(max_length=1000, blank=True, null= False)
+    aliasgraphics = models.CharField(max_length=1000, blank=True, null= False)
+    relationUserGraphics = models.ForeignKey(User, on_delete=models.CASCADE, related_name='graphics', default=None)
+
+
+    
