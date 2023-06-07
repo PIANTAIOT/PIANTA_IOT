@@ -8,7 +8,7 @@ import '../constants.dart';
 //esto es un device
 class NewDevice extends StatefulWidget {
   const NewDevice({Key? key}) : super(key: key);
-
+//Propiedad de Girardot
   @override
   _NewDeviceState createState() => _NewDeviceState();
 }

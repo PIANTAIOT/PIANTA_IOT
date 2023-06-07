@@ -1,9 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:pianta/MyDevices/Dashboard.dart';
 import 'package:http/http.dart' as http;
 import '../Home/templates.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../constants.dart';
 import '../maps/maps.dart';
 
 class VirtualPinDatastream extends StatefulWidget {
@@ -18,23 +21,61 @@ class _VirtualPinDatastreamState extends State<VirtualPinDatastream> {
   List<String> listaDePuertos = <String>["V1", "V2", "V3", "V4"];
   List<String> listaTipoDato = <String>["Float", "Integer", "String"];
 
-  Future<dynamic> crearGrafico(String title, String name, String alias) async {
+  final TextEditingController nameGraphicscontroller = TextEditingController();
+  final TextEditingController aliasgraphicscontroller = TextEditingController();
+
+
+
+  Future<dynamic> crearGrafico(BuildContext context) async {
+    var box = await Hive.openBox(tokenBox);
+    final token = box.get("token") as String?;
+
+  final prefs = await SharedPreferences.getInstance();
+  final storedTitle = prefs.getString('title');
+  final storedName = prefs.getString('name');
+  final storedAlias = prefs.getString('alias');
+  print(storedAlias);
+  print(storedName);
+  print(storedTitle);
+  try {
     final response = await http.post(
       Uri.parse('http://127.0.0.1:8000/user/graphics/'),
       body: {
-        'titlegraphics': title,
-        'namegraphics': name,
-        'aliasgraphics': alias,
+        'titlegraphics': storedTitle,
+        'namegraphics': storedName,
+        'aliasgraphics': storedAlias,
       },
+      headers: {'Authorization': 'Token $token'},
     );
-
     if (response.statusCode == 201) {
       // El gráfico fue creado exitosamente
-      return json.decode(response.body);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('graphics created successfully')),
+      );
     } else {
       // El request falló
-      throw Exception('Error al crear el gráfico');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred while creating the graphics')),
+      );
     }
+  } catch (e){
+    print(e);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: ${e.toString()}')),
+    );
+  }
+    await prefs.remove('title');
+    await prefs.remove('name');
+    await prefs.remove('alias');
+
+  }
+  void _saveName(String name) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('name', name);
+  }
+  void _saveAlias(String alias) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('alias', alias);
   }
 
 
@@ -99,8 +140,9 @@ class _VirtualPinDatastreamState extends State<VirtualPinDatastream> {
                                         ),
                                         const SizedBox(height: 16.0),
                                         TextFormField(
+                                          controller: nameGraphicscontroller,
                                           decoration: const InputDecoration(
-                                            hintText: 'Enter title',
+                                            hintText: 'Enter name',
                                             border: OutlineInputBorder(),
                                           ),
                                         ),
@@ -121,6 +163,7 @@ class _VirtualPinDatastreamState extends State<VirtualPinDatastream> {
                                         ),
                                         const SizedBox(height: 16.0),
                                         TextFormField(
+                                          controller: aliasgraphicscontroller,
                                           decoration: const InputDecoration(
                                             hintText: 'Enter title',
                                             border: OutlineInputBorder(),
@@ -240,7 +283,10 @@ class _VirtualPinDatastreamState extends State<VirtualPinDatastream> {
                                 ),
                                 SizedBox(width: 20),
                                 ElevatedButton(
-                                  onPressed: (){
+                                  onPressed: () async {
+                                    _saveName(aliasgraphicscontroller.text);
+                                    _saveAlias(nameGraphicscontroller.text);
+                                    await crearGrafico(context);
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(builder: (context) => WebDashboard())

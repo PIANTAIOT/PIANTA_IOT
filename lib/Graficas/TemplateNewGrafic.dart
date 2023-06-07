@@ -12,7 +12,7 @@ class TempCreateGrafics extends StatefulWidget {
 
 class _TempCreateGraficsState extends State<TempCreateGrafics> {
   List<String> listaDeOpciones = <String>["Temperatura", "Humedad"];
-  final TextEditingController titleController = TextEditingController();
+  final TextEditingController titleGrapichsController = TextEditingController();
   final _keyForm = GlobalKey<FormState>();
 
   void _savetitle(String title) async {
@@ -72,7 +72,7 @@ class _TempCreateGraficsState extends State<TempCreateGrafics> {
                         ),
                         const SizedBox(height: 16.0),
                         TextFormField(
-                          controller: titleController,
+                          controller: titleGrapichsController,
                           decoration: const InputDecoration(
                             hintText: 'Enter title',
                             border: OutlineInputBorder(),
@@ -128,8 +128,8 @@ class _TempCreateGraficsState extends State<TempCreateGrafics> {
                         Flexible(
                             child: ElevatedButton(
                                 onPressed: () {
-                                    _savetitle(titleController.text);
-                                    print(_savetitle);
+                                    _savetitle(titleGrapichsController.text);
+                                    print(titleGrapichsController.text);
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(

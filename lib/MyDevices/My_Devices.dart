@@ -7,6 +7,7 @@ import 'package:pianta/MyDevices/New_Devices.dart';
 import 'package:pianta/Funciones/constantes.dart';
 
 import '../constants.dart';
+//propiedad de Juan Sebastian Girardot Antonio
 
 class Devices {
   final int id;
@@ -61,7 +62,6 @@ class _MyDeviceState extends State<MyDevice> {
         );
       },
     );
-
     if (confirm == true) {
       final response = await http.delete(Uri.parse('http://127.0.0.1:8000/user/devices/$id/'),
         headers: {'Authorization': 'Token $token'},

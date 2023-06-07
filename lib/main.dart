@@ -4,9 +4,10 @@ import 'package:pianta/Home/proyecto.dart';
 import 'package:pianta/api_login.dart';
 import 'package:pianta/constants.dart';
 import 'package:pianta/user_models.dart';
-import 'register/login.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'register/login.dart';  
+
+//import 'package:flutter_bloc/flutter_bloc.dart';
+//import 'package:flutter_riverpod/flutter_riverpod.dart';
 //import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 //import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
        },
        */
 
+                    
       debugShowCheckedModeBanner: false,
       home: FutureBuilder<Box>(
         future: Hive.openBox(tokenBox),

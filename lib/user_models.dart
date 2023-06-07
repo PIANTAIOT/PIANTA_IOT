@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+
 /*
 class UserRegister {
   late String email;
@@ -45,7 +46,6 @@ class User {
     //this.last_name,
     this.id,
     this.username,
-
   });
 
 //{"pk":2,"username":"","email":"example1@gmail.com","first_name":"First","last_name":"Last"}
@@ -57,8 +57,6 @@ class User {
       id: json["pk"],
       //last_name: json["last_name"],
       username: json["username"],
-
     );
   }
 }
-
