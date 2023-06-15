@@ -481,7 +481,6 @@ class GraphicsApiView(APIView):
 
     def perform_create(self, serializer):
         serializer.save(relationUserGraphics=self.request.user)
-
     def get(self, request, *args, **kwargs):
         '''
         List all the project items for given requested user
@@ -498,11 +497,13 @@ class GraphicsApiView(APIView):
             'titlegraphics': request.data.get('titlegraphics'),
             'namegraphics': request.data.get('namegraphics'),
             'aliasgraphics': request.data.get('aliasgraphics'),
+            'location': request.data.get('location'),
         }
         serializer = GraphicsSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
 class GraphicsApiDetailView(APIView):
     def get_object(self, graphics_id):
         try:
@@ -533,6 +534,7 @@ class GraphicsApiDetailView(APIView):
             'titlegraphics': request.data.get('titlegraphics'),
             'namegraphics': request.data.get('namegraphics'),
             'aliasgraphics': request.data.get('aliasgraphics'),
+            'location': request.data.get('location'),
         }
         serializer = GraphicsSerializer(
             instance=graphics_instance,

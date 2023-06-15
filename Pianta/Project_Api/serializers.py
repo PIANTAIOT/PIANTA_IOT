@@ -100,6 +100,7 @@ class GraphicsSerializer(serializers.ModelSerializer):
             "titlegraphics",
             "namegraphics",
             "aliasgraphics",
+            "location",
             "relationUserGraphics",
         ]
         read_only_fields = ['id']
@@ -112,17 +113,3 @@ class GraphicsSerializer(serializers.ModelSerializer):
         graphicsx = graphics.objects.create(**validated_data)
         return graphicsx
     
-    def validate(self, data):
-            # Verificar si el campo "titlegraphics" está presente en los datos
-        if 'titlegraphics' in data:
-            # Verificar si el valor del campo es nulo o está en blanco
-            if data['titlegraphics'] is None or data['titlegraphics'] == '':
-                # Eliminar el campo "titlegraphics" si está vacío
-                del data['titlegraphics']
-        # Verificar si el campo "aliasgraphics" está presente en los datos
-        if 'aliasgraphics' in data:
-            # Verificar si el valor del campo es nulo o está en blanco
-            if data['aliasgraphics'] is None or data['aliasgraphics'] == '':
-                # Eliminar el campo "aliasgraphics" si está vacío
-                del data['aliasgraphics']
-        return data
